@@ -1,8 +1,10 @@
 const fs = require('fs');
+const path = require('path');
 const cheerio = require('cheerio');
 const iconv = require('iconv-lite');
 const request = require('request');
 const jschardet = require('jschardet');
+const urlParse = require('url-parse');
 
 const $ = cheerio;
 
@@ -15,6 +17,7 @@ module.exports = class Scraping {
    * @param {string} url - the website's url
    */
   constructor(url) {
+    this.url = url;
     this.wating = ()=> {
       return new Promise((resolve)=>{
         if (typeof this.body !== 'undefined') resolve();
@@ -83,7 +86,27 @@ module.exports = class Scraping {
       let result = [];
 
       $doms.each((i, el)=>{
-        result.push( cheerio(el).attr(attr) );
+        let attrVal = cheerio(el).attr(attr);
+
+        if (attr === 'src' || attr === 'href') {
+          let location = urlParse(this.url);
+          let fullPath = location.protocol + '//' + location.hostname;
+
+          if (/^\//.test(attrVal)) {
+            attrVal = fullPath + attrVal;
+          }
+          else {
+            if ( /\/$/.test(location.pathname) ) {
+              attrVal = path.join(location.protocol + '//' + location.hostname + location.pathname, attrVal); 
+            }
+            else {
+              let pathname = /^(.*\/)(.*)\.(.*)$/g.exec(location.pathname)[1];
+              attrVal = location.protocol + '//' + location.hostname + path.join(pathname, attrVal);
+            }
+          }
+        }
+
+        result.push( attrVal );
       });
 
       return result;
@@ -125,23 +148,3 @@ module.exports = class Scraping {
   }
 }
 
-// let scraping = new Scraping('http://blog.kzhrk.com/');
-// scraping.getText('h2').then((data)=>{
-//   console.log(data);
-// });
-
-
-// let scraping = new Scraping('http://www.lixil.co.jp/lineup/livingroom_bedroom/wall/default.htm');
-// scraping.checkSelectors(['.section .box-txt', '.section .box-img']).then((result)=>{
-//   debugger
-//   console.log(result);
-// })
-
-// Scraping.getHtml('http://www.lixil.co.jp/lineup/livingroom_bedroom/wall/default.htm', {
-//   'title'      : '.box-txt h3.h4',
-//   'description': '.box-txt .txt-14',
-//   'url'        : '.box-img a[href]',
-//   'imgPath'    : '.box-img > a > img'
-// });
-
-// module.export = Scraping;

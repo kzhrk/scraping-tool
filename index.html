@@ -15,13 +15,19 @@
     <table>
       <tr>
         <th>Name</th>
+        <th>Type</th>
         <th>Selector</th>
-        <th>Attribute</th>
       </tr>
       <tr class="js-group">
         <td><input type="text" class="js-name"></td>
+        <td>
+          <select class="js-type">
+            <option value="text">text</option>
+            <option value="img">img</option>
+            <option value="link">link</option>
+          </select>
+        </td>
         <td><input type="text" class="js-selector"></td>
-        <td><input type="text" class="js-attr"></td>
       </tr>
     </table>
     <button id="js-submit">Submit</button>
