@@ -3,35 +3,62 @@
   <head>
     <meta charset="UTF-8">
     <title>Hello World!</title>
+    <link rel="stylesheet" href="css/app.css">
   </head>
   <body>
     <h1>Scraping Tool</h1>
-    <table>
-      <tr>
-        <th>URL</th>
-        <td><input type="text" id="js-url"></td>
-      </tr>
-    </table>
-    <table>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Selector</th>
-      </tr>
-      <tr class="js-group">
-        <td><input type="text" class="js-name"></td>
-        <td>
-          <select class="js-type">
-            <option value="text">text</option>
-            <option value="img">img</option>
-            <option value="link">link</option>
-          </select>
-        </td>
-        <td><input type="text" class="js-selector"></td>
-      </tr>
-    </table>
-    <button id="js-submit">Submit</button>
-    <button id="js-clone">Add</button>
+    <div id="app">
+      <block-component v-for="block in blocks"></block-component>
+      <button v-on:click="duplicate">Duplicate</button>
+      <button id="js-submit" v-on:click="submit">Submit</button>
+    </div>
+
+    <script type="text/template" id="js-template">
+      <div class="block">
+        <table>
+          <tr>
+            <th>URL</th>
+            <td><input type="text" class="js-url"></td>
+          </tr>
+        </table>
+        <table>
+          <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Selector</th>
+          </tr>
+          <tr class="js-group">
+            <td><input type="text" v-model="newName"></td>
+            <td>
+              <select v-model="newType">
+                <option value="text">text</option>
+                <option value="img">img</option>
+                <option value="link">link</option>
+              </select>
+            </td>
+            <td><input type="text" v-model="newSelector"></td>
+          </tr>
+          <tr>
+            <td colspan="4"><button class="btn-add" v-on:click="add">Add</button></td>
+          </tr>
+        </table>
+        <hr>
+        <table>
+          <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Selector</th>
+            <th>Delete</th>
+          </tr>
+          <tr v-for="data in selectors" class="js-row">
+            <td class="js-name">{{ data.name }}</td>
+            <td class="js-type">{{ data.type }}</td>
+            <td class="js-selector">{{ data.selector }}</td>
+            <td><button v-on:click="delete($index)">delete</button></td>
+          </tr>
+        </table>
+      </div>
+    </script>
   </body>
 
   <script>
